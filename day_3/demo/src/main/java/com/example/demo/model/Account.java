@@ -16,9 +16,10 @@ public class Account {
 
     @Id
     private Long accountNumber;
-    
+
     private String holderName;
-    
+
+    private String password;
+
     private Double balance;
-    
 }

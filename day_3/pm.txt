@@ -1,0 +1,394 @@
+============================================================
+BANK MANAGEMENT SYSTEM
+POSTMAN API TESTING
+===================
+
+BASE URL:
+http://localhost:8080
+
+IMPORTANT:
+
+1. Start the Spring Boot application.
+2. Open Postman.
+3. Test the APIs in the order given below.
+4. For JSON requests:
+   Body → raw → JSON
+5. For Deposit/Withdraw:
+   Params → Query Parameter
+6. Check the expected status and response after every request.
+
+============================================================
+
+1. CUSTOMER SIGN UP
+   ============================================================
+
+Operation:
+Create a new customer account
+
+Method:
+POST
+
+URL:
+http://localhost:8080/api/account/signup
+
+Body:
+Body → raw → JSON
+
+Request JSON:
+
+{
+"accountNumber": 103,
+"holderName": "Deepak Raj",
+"password": "securePass123",
+"balance": 5000.0
+}
+
+Expected Status:
+200 OK
+
+Expected Response:
+
+{
+"accountNumber": 103,
+"holderName": "Deepak Raj",
+"password": "securePass123",
+"balance": 5000.0
+}
+
+============================================================
+2. TEST DUPLICATE ACCOUNT NUMBER
+================================
+
+Purpose:
+Check whether the system prevents duplicate account numbers.
+
+Method:
+POST
+
+URL:
+http://localhost:8080/api/account/signup
+
+Body:
+Same JSON as Step 1
+
+Expected Status:
+409 Conflict
+
+Expected Response:
+
+"Account #103 already exists. Please choose a different number."
+
+============================================================
+3. CUSTOMER SIGN IN (LOGIN)
+===========================
+
+Method:
+POST
+
+URL:
+http://localhost:8080/api/account/login
+
+Headers:
+
+Content-Type: application/json
+
+Body:
+Body → raw → JSON
+
+Request JSON:
+
+{
+"accountNumber": 103,
+"password": "securePass123"
+}
+
+Expected Status:
+200 OK
+
+Expected Response:
+
+Returns the authenticated Account JSON object.
+
+============================================================
+4. CUSTOMER LOGIN – WRONG PASSWORD
+==================================
+
+Purpose:
+Test invalid login credentials.
+
+Method:
+POST
+
+URL:
+http://localhost:8080/api/account/login
+
+Headers:
+
+Content-Type: application/json
+
+Body:
+Body → raw → JSON
+
+Request JSON:
+
+{
+"accountNumber": 103,
+"password": "wrongpassword"
+}
+
+Expected Status:
+401 Unauthorized
+
+Expected Response:
+
+"Invalid Account Number or Password"
+
+============================================================
+5. CHECK AVAILABLE BALANCE
+==========================
+
+Method:
+GET
+
+URL:
+http://localhost:8080/api/account/103/balance
+
+Body:
+None
+
+Expected Status:
+200 OK
+
+Expected Response:
+
+{
+"accountNumber": 103,
+"holderName": "Deepak Raj",
+"password": "securePass123",
+"balance": 5000.0
+}
+
+============================================================
+6. DEPOSIT FUNDS
+================
+
+Method:
+PUT
+
+URL:
+http://localhost:8080/api/account/103/deposit?amount=7000
+
+Body:
+None
+
+Query Parameter:
+
+Key: amount
+Value: 7000
+
+Expected Status:
+200 OK
+
+Expected Result:
+
+Balance updates to:
+
+12000.0
+
+============================================================
+7. WITHDRAW FUNDS – VALID
+=========================
+
+Method:
+PUT
+
+URL:
+http://localhost:8080/api/account/103/withdraw?amount=2000
+
+Body:
+None
+
+Query Parameter:
+
+Key: amount
+Value: 2000
+
+Expected Status:
+200 OK
+
+Expected Result:
+
+Balance updates to:
+
+10000.0
+
+============================================================
+8. WITHDRAW FUNDS – OVERDRAFT TEST
+==================================
+
+Purpose:
+Check whether the system prevents withdrawal when
+there are insufficient funds.
+
+Method:
+PUT
+
+URL:
+http://localhost:8080/api/account/103/withdraw?amount=50000
+
+Body:
+None
+
+Query Parameter:
+
+Key: amount
+Value: 50000
+
+Expected Status:
+400 Bad Request
+
+Expected Response:
+
+"Withdrawal failed. Insufficient funds or invalid amount."
+
+============================================================
+9. ADMIN SIGN IN (LOGIN)
+========================
+
+Method:
+POST
+
+URL:
+http://localhost:8080/api/admin/login
+
+Headers:
+
+Content-Type: application/json
+
+Body:
+Body → raw → JSON
+
+Request JSON:
+
+{
+"username": "admin",
+"password": "admin123"
+}
+
+Expected Status:
+200 OK
+
+Expected Response:
+
+{
+"username": "admin",
+"password": "admin123",
+"fullName": "Chief Bank Auditor"
+}
+
+============================================================
+10. ADMIN – AUDIT CUSTOMER LEDGER
+=================================
+
+Purpose:
+Admin can view all registered customer accounts.
+
+Method:
+GET
+
+URL:
+http://localhost:8080/api/admin/accounts
+
+Body:
+None
+
+Expected Status:
+200 OK
+
+Expected Response:
+
+JSON array containing all registered accounts.
+
+Example:
+
+[
+{
+"accountNumber": 101,
+"holderName": "...",
+"balance": "..."
+},
+{
+"accountNumber": 102,
+"holderName": "...",
+"balance": "..."
+},
+{
+"accountNumber": 103,
+"holderName": "Deepak Raj",
+"balance": 10000.0
+}
+]
+
+============================================================
+11. ADMIN – CALCULATE VAULT RESERVES
+====================================
+
+Purpose:
+Calculate the total number of accounts and the total
+balance maintained by the bank.
+
+Method:
+GET
+
+URL:
+http://localhost:8080/api/admin/vault
+
+Body:
+None
+
+Expected Status:
+200 OK
+
+Expected Response:
+
+{
+"totalAccounts": 3,
+"totalVaultBalance": 53000.0
+}
+
+============================================================
+12. ADMIN – DELETE / CLOSE ACCOUNT
+==================================
+
+Method:
+DELETE
+
+URL:
+http://localhost:8080/api/admin/accounts/103
+
+Body:
+None
+
+Expected Status:
+200 OK
+
+Expected Response:
+
+"Account #103 closed successfully"
+
+============================================================
+TESTING ORDER
+=============
+
+1. Customer Sign Up
+2. Duplicate Account Test
+3. Customer Login
+4. Wrong Password Test
+5. Check Balance
+6. Deposit Funds
+7. Valid Withdrawal
+8. Overdraft Test
+9. Admin Login
+10. Admin View Accounts
+11. Calculate Vault Reserves
+12. Delete / Close Account

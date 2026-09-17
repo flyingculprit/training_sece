@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NextGen Bank Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <header class="navbar">
+        <div class="navbar-brand">
+            <i class="fa-solid fa-building-columns"></i>
+            <span>NextGen Bank Portal</span>
+        </div>
+        <div id="userInfo" class="user-nav-box" style="display: none;">
+            <span id="roleBadge" class="role-pill"></span>
+            <span id="displayName" style="font-weight: 600; font-size: 14px;"></span>
+            <button class="btn-logout" onclick="handleLogout()">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- 1. AUTHENTICATION (LOGIN & SIGNUP) -->
+        <section id="authSection" class="view-panel active">
+            <div class="card auth-card">
+                <h2 id="authTitle" class="auth-heading">Customer Sign In</h2>
+                <p id="authSubtitle" class="auth-subtext">Access your personal banking account</p>
+
+                <!-- Auth Navigation Tabs -->
+                <div class="tab-switcher">
+                    <button class="tab-btn active" id="tabCustomerLogin" onclick="switchAuthTab('CUSTOMER_LOGIN')">
+                        <i class="fa-solid fa-right-to-bracket"></i> Sign In
+                    </button>
+                    <button class="tab-btn" id="tabCustomerSignup" onclick="switchAuthTab('CUSTOMER_SIGNUP')">
+                        <i class="fa-solid fa-user-plus"></i> Open Account
+                    </button>
+                    <button class="tab-btn" id="tabAdminLogin" onclick="switchAuthTab('ADMIN_LOGIN')">
+                        <i class="fa-solid fa-shield-halved"></i> Admin
+                    </button>
+                </div>
+
+                <!-- Feedback Alert -->
+                <div id="authAlert" class="alert"></div>
+
+                <!-- 1A. Customer Login Form -->
+                <form id="customerLoginForm" onsubmit="loginCustomer(event)">
+                    <div class="form-group">
+                        <label>Account Number</label>
+                        <input type="number" id="loginAccNum" class="form-control" placeholder="e.g. 101" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" class="form-control" placeholder="pass123" required>
+                    </div>
+                    <button type="submit" class="btn-submit">Sign In to Dashboard</button>
+                </form>
+
+                <!-- 1B. Customer Signup (Registration) Form -->
+                <form id="customerSignupForm" onsubmit="signupCustomer(event)" style="display: none;">
+                    <div class="form-group">
+                        <label>Desired Account Number</label>
+                        <input type="number" id="signupAccNum" class="form-control" placeholder="e.g. 103" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Account Holder Full Name</label>
+                        <input type="text" id="signupHolderName" class="form-control" placeholder="e.g. Deepak Raj" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="signupPassword" class="form-control" placeholder="Create a password" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Initial Opening Deposit (₹)</label>
+                        <input type="number" id="signupInitialBalance" class="form-control" placeholder="e.g. 5000" min="0" step="any" required>
+                    </div>
+                    <button type="submit" class="btn-submit btn-success">
+                        <i class="fa-solid fa-check-circle"></i> Create Bank Account
+                    </button>
+                </form>
+
+                <!-- 1C. Admin Login Form -->
+                <form id="adminLoginForm" onsubmit="loginAdmin(event)" style="display: none;">
+                    <div class="form-group">
+                        <label>Admin Username</label>
+                        <input type="text" id="adminUsername" class="form-control" placeholder="admin" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Admin Password</label>
+                        <input type="password" id="adminPassword" class="form-control" placeholder="admin123" required>
+                    </div>
+                    <button type="submit" class="btn-submit btn-dark">Sign In as Admin</button>
+                </form>
+
+                <!-- Demo Credentials Helper -->
+                <div class="demo-box">
+                    <strong>Pre-seeded Demo Accounts (MySQL):</strong><br>
+                    • Customer 1: A/C <code>101</code> | Pass: <code>pass123</code><br>
+                    • Customer 2: A/C <code>102</code> | Pass: <code>pass123</code><br>
+                    • Admin: User <code>admin</code> | Pass: <code>admin123</code>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. CUSTOMER (USER) DASHBOARD -->
+        <section id="userSection" class="view-panel">
+            <div id="userFeedback" class="alert"></div>
+
+            <div class="balance-card">
+                <div>
+                    <div class="balance-label">Current Available Balance</div>
+                    <div class="balance-amount">₹ <span id="balanceDisplay">0.00</span></div>
+                </div>
+                <div style="text-align: right;">
+                    <div id="holderNameDisplay" style="font-size: 22px; font-weight: 700;">Customer Name</div>
+                    <div style="opacity: 0.9; font-size: 14px; margin-top: 4px;">Account #<span id="accNumberDisplay">---</span></div>
+                </div>
+            </div>
+
+            <div class="actions-grid">
+                <!-- Deposit Form -->
+                <div class="card">
+                    <h3 class="card-action-title text-success">
+                        <i class="fa-solid fa-arrow-down"></i> Deposit Money
+                    </h3>
+                    <form onsubmit="handleDeposit(event)">
+                        <div class="form-group">
+                            <label>Amount (₹)</label>
+                            <input type="number" id="depositAmount" class="form-control" placeholder="e.g. 5000" min="1" step="any" required>
+                        </div>
+                        <button type="submit" class="btn-submit btn-success">Confirm Deposit</button>
+                    </form>
+                </div>
+
+                <!-- Withdraw Form -->
+                <div class="card">
+                    <h3 class="card-action-title text-danger">
+                        <i class="fa-solid fa-arrow-up"></i> Withdraw Money
+                    </h3>
+                    <form onsubmit="handleWithdraw(event)">
+                        <div class="form-group">
+                            <label>Amount (₹)</label>
+                            <input type="number" id="withdrawAmount" class="form-control" placeholder="e.g. 2000" min="1" step="any" required>
+                        </div>
+                        <button type="submit" class="btn-submit btn-danger">Confirm Withdrawal</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. ADMIN DASHBOARD -->
+        <section id="adminSection" class="view-panel">
+            <div id="adminFeedback" class="alert"></div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span>Total Active Accounts</span>
+                    <h3 id="statAccountsCount">0</h3>
+                </div>
+                <div class="stat-card">
+                    <span>Total Vault Reserves (MySQL)</span>
+                    <h3 class="text-success">₹ <span id="statVaultSum">0.00</span></h3>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="ledger-header">
+                    <div>
+                        <h3 style="font-size: 18px;">Customer Accounts Ledger</h3>
+                        <p style="font-size: 13px; color: var(--text-muted);">Real-time synchronization with MySQL database</p>
+                    </div>
+                    <button class="btn-refresh" onclick="loadAdminLedger()">
+                        <i class="fa-solid fa-rotate-right"></i> Refresh Table
+                    </button>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Account No</th>
+                            <th>Account Holder</th>
+                            <th>Current Balance</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="accountsTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Link to JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
