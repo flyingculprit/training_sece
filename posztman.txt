@@ -1,0 +1,239 @@
+============================================================
+       NEXTGEN BANK MANAGEMENT SYSTEM
+             POSTMAN API TESTING
+============================================================
+
+BASE URL:
+http://localhost:8080
+
+IMPORTANT:
+1. Start the Spring Boot application first.
+2. Open Postman.
+3. Test the APIs in the order given below.
+4. For POST requests, select:
+   Body → raw → JSON
+5. For Deposit and Withdraw, use:
+   Params → Query Parameter
+
+
+------------------------------------------------------------
+1. WELCOME
+------------------------------------------------------------
+
+Method:
+GET
+
+URL:
+http://localhost:8080/api/accounts/welcome
+
+Body:
+None
+
+Expected Status:
+200 OK
+
+Expected Response:
+Welcome to NextGen Bank Management System!
+
+
+------------------------------------------------------------
+2. CREATE ACCOUNT
+------------------------------------------------------------
+
+Method:
+POST
+
+URL:
+http://localhost:8080/api/accounts
+
+Body:
+Body → raw → JSON
+
+Request JSON:
+
+{
+  "accountNumber": 101,
+  "holderName": "Arun Kumar",
+  "balance": 10000.0
+}
+
+Expected Status:
+200 OK
+
+Expected Response:
+
+{
+  "accountNumber": 101,
+  "holderName": "Arun Kumar",
+  "balance": 10000.0
+}
+
+
+------------------------------------------------------------
+3. GET ACCOUNT BY ID
+------------------------------------------------------------
+
+Method:
+GET
+
+URL:
+http://localhost:8080/api/accounts/101
+
+Body:
+None
+
+Expected Status:
+200 OK
+
+Expected Response:
+
+{
+  "accountNumber": 101,
+  "holderName": "Arun Kumar",
+  "balance": 10000.0
+}
+
+
+------------------------------------------------------------
+4. DEPOSIT MONEY
+------------------------------------------------------------
+
+Method:
+PUT
+
+URL:
+http://localhost:8080/api/accounts/101/deposit?amount=5000
+
+Body:
+None
+
+Query Parameter:
+
+Key: amount
+Value: 5000
+
+Expected Status:
+200 OK
+
+Expected Response:
+
+{
+  "accountNumber": 101,
+  "holderName": "Arun Kumar",
+  "balance": 15000.0
+}
+
+
+------------------------------------------------------------
+5. WITHDRAW MONEY
+------------------------------------------------------------
+
+Method:
+PUT
+
+URL:
+http://localhost:8080/api/accounts/101/withdraw?amount=3000
+
+Body:
+None
+
+Query Parameter:
+
+Key: amount
+Value: 3000
+
+Expected Status:
+200 OK
+
+Expected Response:
+
+{
+  "accountNumber": 101,
+  "holderName": "Arun Kumar",
+  "balance": 12000.0
+}
+
+
+------------------------------------------------------------
+6. GET ALL ACCOUNTS
+------------------------------------------------------------
+
+Method:
+GET
+
+URL:
+http://localhost:8080/api/accounts
+
+Body:
+None
+
+Expected Status:
+200 OK
+
+Expected Response:
+
+[
+  {
+    "accountNumber": 101,
+    "holderName": "Arun Kumar",
+    "balance": 12000.0
+  }
+]
+
+NOTE:
+If multiple accounts are created, all accounts
+will be displayed in the JSON array.
+
+
+------------------------------------------------------------
+7. DELETE ACCOUNT
+------------------------------------------------------------
+
+Method:
+DELETE
+
+URL:
+http://localhost:8080/api/accounts/101
+
+Body:
+None
+
+Expected Status:
+200 OK
+
+Expected Response:
+
+Account deleted successfully
+
+
+============================================================
+                 TESTING ORDER
+============================================================
+
+1. GET     → Welcome
+2. POST    → Create Account
+3. GET     → Get Account by ID
+4. PUT     → Deposit Money
+5. PUT     → Withdraw Money
+6. GET     → Get All Accounts
+7. DELETE  → Delete Account
+
+============================================================
+                  BALANCE FLOW
+============================================================
+
+Initial Balance:
+₹10,000
+
+After Deposit ₹5,000:
+₹15,000
+
+After Withdraw ₹3,000:
+₹12,000
+
+After Delete:
+Account Removed
+
+============================================================
+                    END
+============================================================
